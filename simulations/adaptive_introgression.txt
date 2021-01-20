@@ -1,0 +1,94 @@
+//testing starlike approximation -- ai Model -- drafted by DS
+
+initialize() {
+        
+        initializeMutationRate(0.0);
+
+        //homozygous selection coefficient is 0.1, heterozygous 0.05, so 2Ne*s = 1000
+        initializeMutationType("m1", 0.5, "f", 0.1);
+        initializeMutationType('m2', 0.5, 'f', 0.0);
+        initializeGenomicElementType('g2', m2, 1.0);
+        initializeGenomicElement(g2,0,50000);  
+        initializeRecombinationRate(1e-6);
+        
+        //initializeTreeSeq(simplificationRatio=NULL, simplificationInterval=500);
+        
+        initializeTreeSeq();
+
+        // *** set the working directory
+        //setwd('');
+}
+
+1 {
+        defineConstant('sample_size',24);
+        defineConstant("simID", getSeed());
+        defineConstant("Ne", 1e4);
+        save_time = c(0.1,0.25,0.5,1,1.5)*Ne;
+        sim.setValue('save_time', save_time);
+
+        // assume hard sweep of single migrant so we set 
+        // donor pop size is 1 to avoid simulating selection in donor explicitly
+        sim.addSubpop('p1', Ne); // recipient
+        sim.addSubpop('p2', 1);  // donor
+
+}
+
+1 late() {
+		target = sample(p2.genomes, 2);
+        target.addNewDrawnMutation(m1, 25000); 
+}
+
+999 late() {
+        sim.treeSeqOutput("/tmp/slim_" + simID + ".trees");
+}
+1000 late(){
+        sim.setValue('not_fixed', T);
+        p1.setMigrationRates(p2,1/Ne);
+}
+
+1001 late() {
+		p1.setMigrationRates(p2,0);
+}
+
+1001:100000 late() {
+        if (sim.getValue('not_fixed')){
+        		//cat(sum(p1.genomes.countOfMutationsOfType(m1)));
+        		//cat("\n");
+
+                if ( sum(p1.genomes.countOfMutationsOfType(m1)) == 0){
+
+                        fixed = (sum(sim.substitutions.mutationType == m1) == 1);
+         
+                        if (fixed){
+                                //save generation in which fixed
+                                sim.setValue('gen', sim.substitutions.fixationGeneration);
+                                sim.setValue('not_fixed', F);
+                                sample = sample(p1.individuals, size=sample_size);
+                                sim.treeSeqRememberIndividuals(sample);
+                                }
+                        
+                        else{
+                        		//cat("restarting \n");
+                                // start a newly seeded run
+                                sim.readFromPopulationFile("/tmp/slim_" + simID + ".trees");
+                                setSeed(rdunif(1, 0, asInteger(2^32) - 1));
+
+                                } 
+                        }
+                }
+
+        else{
+                if (any(sim.getValue('save_time')==(sim.generation-sim.getValue('gen')))){
+                                //sample 10 individuals, save them in treesequence
+                                sample = sample(p1.individuals, size=sample_size);
+                                sim.treeSeqRememberIndividuals(sample);
+                                } 
+                if ((sim.generation-sim.getValue('gen'))>=(2*Ne)){
+                                sim.treeSeqOutput('slim_'+simID+'_FIXED.trees');
+                                sim.simulationFinished();
+                                }       
+                        }       
+}
+
+100000 { sim.simulationFinished(); }
+
