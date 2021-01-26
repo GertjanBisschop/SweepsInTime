@@ -6,7 +6,7 @@ from tqdm import tqdm
 def simulate_replicate(seed):
 	sample_size = 24
 	ts = msprime.simulate(sample_size, Ne=10000, recombination_rate=1e-7, mutation_rate=1.25e-7,random_seed=seed, length=1000000)
-	ts.dump(f'/scratch/gbisshop/classic_sweeps/neutral_n24/{seed}.trees')
+	ts.dump(f'{seed}.trees')
 
 def main():
 	replicates = 10000

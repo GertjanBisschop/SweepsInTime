@@ -6,11 +6,8 @@ import numpy as np
 
 def main():
 
-        # directory = '/exports/eddie/scratch/s1854903/starlike/s_weak'
-        # directory_out = '/exports/eddie/scratch/s1854903/starlike/s_weak'
-
-        directory = "/ceph/users/gbisshop/output/adaptive_introgression/trees"
-        directory_out = "/scratch/gbisshop/ai_recap"
+        directory = "" #set directory containing trees
+        directory_out = ""
 
         print(os.listdir(directory))
 

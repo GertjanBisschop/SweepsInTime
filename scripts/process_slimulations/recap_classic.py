@@ -6,8 +6,8 @@ import numpy as np
 from tqdm import tqdm
 
 def recap_mutate(tree):
-	directory_out='/scratch/gbisshop/classic_sweeps/selection_recap'
-	directory = '/scratch/gbisshop/classic_sweeps/selection_trees'
+	directory_out=''
+	directory = os.getcwd()
 	done_file_list = [file for file in os.listdir(directory_out) if file.endswith('.recap')]
 	new_name = tree.rstrip('.trees')+'.recap'
 	if new_name not in done_file_list:
@@ -18,16 +18,10 @@ def recap_mutate(tree):
 	return None
 
 def main():
-	directory = '/scratch/gbisshop/classic_sweeps/selection_trees'
-	directory_out = '/scratch/gbisshop/classic_sweeps/selection_recap'
 	threads = 60
-
-	file_list = [file for file in os.listdir(directory) if file.endswith('.trees')]
+	file_list = [file for file in os.listdir(os.getcwd()) if file.endswith('.trees')]
 	with multiprocessing.Pool(processes=threads) as pool:
 		pool.map(recap_mutate, file_list)
-	#for file in tqdm(file_list):
-	#	recap_mutate(file)
-print('done')
-
+	
 if __name__ == '__main__':
 	main()

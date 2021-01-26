@@ -45,8 +45,8 @@ def processTime(T):
 
 def main():
     global Ne, sample_size, sites, file_list, directory, outputdir
-    directory = '/ceph/users/gbisshop/output/classic_sweeps/selection/selection_recap'
-    outputdir = '/ceph/users/dsetter/gf_sel/classic_sweeps/marginals'
+    directory = '' #set directory containing trees
+    outputdir = ''
 
 
     file_list = [file for file in os.listdir(directory) if file.endswith('.recap')]
