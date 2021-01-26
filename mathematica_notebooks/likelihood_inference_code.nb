@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    205002,       4797]
-NotebookOptionsPosition[    191192,       4554]
-NotebookOutlinePosition[    191533,       4569]
-CellTagsIndexPosition[    191490,       4566]
+NotebookDataLength[    197561,       4609]
+NotebookOptionsPosition[    184088,       4371]
+NotebookOutlinePosition[    184428,       4386]
+CellTagsIndexPosition[    184385,       4383]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -4175,189 +4175,6 @@ Cell[BoxData[
 
 Cell[CellGroupData[{
 
-Cell["Deprecated functions", "Subsubsection",
- CellChangeTimes->{{3.8108757020614634`*^9, 3.810875708272676*^9}, {
-  3.8190074379537983`*^9, 
-  3.819007469457006*^9}},ExpressionUUID->"9c7f131e-c689-4131-ad43-\
-49fcd7da2862"],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"getLikelihoodYule", "[", 
-   RowBox[{
-   "s_", ",", "N_", ",", " ", "theta_", ",", " ", "ta_", ",", " ", 
-    "bsfs_List", ",", " ", "symbProb_", ",", " ", "recRate_", ",", " ", 
-    "blockLength_", ",", " ", "numSamples_"}], "]"}], ":=", 
-  RowBox[{"Module", "[", "\[IndentingNewLine]", 
-   RowBox[{
-    RowBox[{"{", 
-     RowBox[{
-     "recPerBlock", ",", " ", "PelnProbsPerBlock", ",", "numProb", ",", " ", 
-      "result", ",", "M", ",", " ", "pnorecList", ",", " ", "pfisfList", ",", 
-      "pnorecAll", ",", "sumProbsPerBlock"}], "}"}], ",", 
-    "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{"M", "=", 
-      RowBox[{"Ceiling", "[", 
-       RowBox[{"4", "*", "N", "*", "s"}], "]"}]}], ";", "\[IndentingNewLine]", 
-     RowBox[{"(*", 
-      RowBox[{"precalculate", " ", "lists", " ", "required"}], "*)"}], 
-     "\[IndentingNewLine]", 
-     RowBox[{"pnorecList", "=", 
-      RowBox[{"pnotrecAlt", "[", "M", "]"}]}], ";", "\[IndentingNewLine]", 
-     RowBox[{"pfisfList", " ", "=", " ", 
-      RowBox[{"Table", "[", 
-       RowBox[{
-        RowBox[{"Differences", "[", 
-         RowBox[{
-          RowBox[{
-           RowBox[{"PFi", "[", 
-            RowBox[{"n", ",", "#"}], "]"}], "&"}], "/@", 
-          RowBox[{"Range", "[", 
-           RowBox[{
-            RowBox[{"n", "-", "1"}], ",", "M"}], "]"}]}], "]"}], ",", 
-        RowBox[{"{", 
-         RowBox[{"n", ",", "2", ",", "numSamples"}], "}"}]}], "]"}]}], ";", 
-     "\[IndentingNewLine]", 
-     RowBox[{"recPerBlock", "=", 
-      RowBox[{"Table", "[", 
-       RowBox[{
-        RowBox[{
-         RowBox[{"recRate", "*", 
-          RowBox[{"blockLength", "/", "2"}]}], "+", 
-         RowBox[{"recRate", "*", "blockLength", "*", "i"}]}], ",", 
-        RowBox[{"{", 
-         RowBox[{"i", ",", "0", ",", 
-          RowBox[{
-           RowBox[{"Length", "[", "bsfs", "]"}], "-", "1"}]}], "}"}]}], 
-       "]"}]}], ";", "\[IndentingNewLine]", 
-     RowBox[{"pnorecAll", "=", 
-      RowBox[{
-       RowBox[{
-        RowBox[{
-         SuperscriptBox["\[ExponentialE]", 
-          RowBox[{
-           FractionBox[
-            RowBox[{"-", "#"}], "s"], "pnorecList"}]], "&"}], "/@", 
-        "recPerBlock"}], "//", "Parallelize"}]}], ";", "\[IndentingNewLine]", 
-     
-     RowBox[{"(*", 
-      RowBox[{
-      "pnorecAll", " ", "optimised", " ", "for", " ", "single", " ", 
-       "recombination", " ", "rate", 
-       RowBox[{"??", 
-        RowBox[{",", " ", 
-         RowBox[{"check", " ", "how", " ", "this", " ", "works"}]}]}]}], 
-      "*)"}], "\[IndentingNewLine]", 
-     RowBox[{"(*", 
-      RowBox[{
-      "after", " ", "s", " ", "there", " ", "shouild", " ", "be", " ", "a", 
-       " ", "recombination", " ", "rate", " ", "for", " ", "cprob", " ", "to",
-        " ", "work"}], "*)"}], "\[IndentingNewLine]", 
-     RowBox[{"PelnProbsPerBlock", " ", "=", 
-      RowBox[{
-       RowBox[{
-        RowBox[{
-         RowBox[{"cprob", "[", 
-          RowBox[{
-          "numSamples", ",", " ", "s", ",", " ", "#", ",", "N", ",", " ", "M",
-            ",", "pnorecAll", " ", ",", "pfisfList"}], "]"}], "&"}], "/@", 
-        "pnorecAll"}], "//", "Parallelize"}]}], ";", "\[IndentingNewLine]", 
-     RowBox[{"sumProbsPerBlock", "=", 
-      RowBox[{
-       RowBox[{
-        RowBox[{
-         RowBox[{"Table", "[", 
-          RowBox[{
-           RowBox[{
-            RowBox[{"sumP", "[", "i", "]"}], "\[Rule]", 
-            RowBox[{"sumprobs", "[", 
-             RowBox[{"#", ",", "i"}], "]"}]}], ",", 
-           RowBox[{"{", 
-            RowBox[{"i", ",", "2", ",", "numSamples"}], "}"}]}], "]"}], "&"}],
-         "/@", "PelnProbsPerBlock"}], "//", "Parallelize"}]}], ";", 
-     "\[IndentingNewLine]", 
-     RowBox[{"numProb", "=", 
-      RowBox[{"replaceValueInArrayYule", "[", 
-       RowBox[{
-        RowBox[{"{", 
-         RowBox[{
-          RowBox[{"\[Theta]", "\[Rule]", "theta"}], ",", " ", 
-          RowBox[{"Ta", "\[Rule]", "ta"}]}], "}"}], ",", 
-        RowBox[{"{", 
-         RowBox[{"PelnProbsPerBlock", ",", " ", "sumProbsPerBlock"}], "}"}], 
-        ",", " ", "symbProb"}], "]"}]}], ";", "\[IndentingNewLine]", 
-     RowBox[{"result", "=", 
-      RowBox[{"CalculateLikelihood", "[", 
-       RowBox[{"bsfs", ",", " ", "numProb"}], "]"}]}]}]}], 
-   "\[IndentingNewLine]", "]"}], 
-  RowBox[{"(*", 
-   RowBox[{"deprecated", " ", "function"}], "*)"}]}]], "Input",
- CellChangeTimes->CompressedData["
-1:eJwdxUsow3EAB/ANY9lhQg6bRxsOHstJaSsZUpTl0TxqKXtEo7HSMIpaK6GQ
-XDRzsBqZmdEoe5TFYWmYIYsoIbUyj4vk8fv+D58+PHlfkyqORqNlEdjyqfNv
-KKLiHeNPEGuFV6t28tIH34dbvq/9OODlhnEo3Nm8Sf591Ldh60uNHFusIgVu
-uOP04MrqrmFcZvapnGQTV6DGi/dxGly92qrFMb6O6SZLk9QsHByK1B6Q6T2v
-9dgp/HPg+gT9Fp6yKg1+sl0kM+Lew4xpnJuWP4c94ZkF7C22mXEgsXQFJ+eE
-rPhphFuwroyKGclF1PNvWxLskAo7MPM4T4NrMp+12HRzs49n6QYPjkjPL3DJ
-qe0ZV7GXGTZyNnOUhd9T11Kw8kuSjkOCxm58yVFQs6faB/fIzkI3teywYgzz
-LbxxbDHRJrBLGZ3Grw/9Ri855pyk3r6tcwkGouIze/wu3j4p9+KjezH1P0d4
-9ow=
-  "],ExpressionUUID->"c0c286a6-4f24-475f-b713-bbc59ae4b194"],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"replaceValueInArrayYule", "[", 
-   RowBox[{"singleV_List", ",", " ", "mapV_List", ",", " ", "SpAr_"}], "]"}], 
-  ":=", 
-  RowBox[{"Module", "[", 
-   RowBox[{
-    RowBox[{"{", 
-     RowBox[{"symbProb", ",", " ", "tempr", ",", "\[IndentingNewLine]", 
-      RowBox[{"dim", "=", 
-       RowBox[{"Dimensions", "[", "SpAr", "]"}]}], ",", "JoinMapV"}], "}"}], 
-    ",", "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{"symbProb", "=", 
-      RowBox[{"BlockRules", "[", 
-       RowBox[{"singleV", ",", 
-        RowBox[{"ArrayRules", "[", "SpAr", "]"}]}], "]"}]}], ";", 
-     "\[IndentingNewLine]", 
-     RowBox[{"JoinMapV", "=", 
-      RowBox[{"MapThread", "[", 
-       RowBox[{"Join", ",", " ", "mapV"}], "]"}]}], ";", 
-     "\[IndentingNewLine]", 
-     RowBox[{"tempr", "=", 
-      RowBox[{
-       RowBox[{
-        RowBox[{
-         RowBox[{"BlockRules", "[", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{"\[Alpha]", "\[Rule]", "#"}], "}"}], ",", "symbProb"}], 
-          "]"}], "&"}], "/@", "JoinMapV"}], "//", "Parallelize"}]}], ";", 
-     "\[IndentingNewLine]", 
-     RowBox[{
-      RowBox[{
-       RowBox[{
-        RowBox[{"SparseArray", "[", 
-         RowBox[{"#", ",", " ", "dim"}], "]"}], "&"}], "/@", "tempr"}], " ", "//",
-       "Parallelize"}]}]}], "\[IndentingNewLine]", "]"}], 
-  RowBox[{"(*", 
-   RowBox[{"deprecated", " ", "function"}], "*)"}]}]], "Input",
- CellChangeTimes->CompressedData["
-1:eJxTTMoPSmViYGAQAWIQXX5jRt3G5DeOf09rt4PohpMPekD0PAeJCSD63WaO
-aSBaYnYQmD7w8vdGEH2O7ecWEF3W0LcTRBs7+u0C0TYnQhQ2Aekni81VQTQL
-734TEK2n6GsHottcf7uCaCkNfl8QPe2VWzNYfhFTC4i+kSG5FkS/LsxbD6Jj
-5Jw3g2jJ5K6tIHpJUIzWZiDNoa2oDaL5H6V92gqyP9DmM4j20BC6cgtIL1OR
-/wCiVe/4Vb0F0lsexoBpP/G3b7RT3jhm/l/5HkQvmfMkfQ2Q5jrzDUwniKRU
-gOipHsm1IJrhf+UO3RKg+2Yy7gTRa6dc3Qeip86+DqYB5pCnQQ==
-  
-  "],ExpressionUUID->"cba0e90b-c233-493e-b541-20a2e26a6119"]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
 Cell["ROC curve functions", "Subsubsection",
  CellChangeTimes->{{3.819021786785637*^9, 
   3.8190218077179947`*^9}},ExpressionUUID->"b29fcca5-aa5f-4323-8c44-\
@@ -4550,10 +4367,10 @@ Cell[BoxData[
  CellChangeTimes->{{3.81114391662362*^9, 3.811143950223387*^9}, {
   3.811147898806229*^9, 3.811147903258363*^9}},
  CellLabel->"In[5]:=",ExpressionUUID->"77d4cbd5-7922-48ef-87a1-a7430437cdf1"]
-}, Open  ]]
+}, Closed]]
 },
 WindowSize->{960, 1035},
-WindowMargins->{{Automatic, -960}, {417, Automatic}},
+WindowMargins->{{-1920, Automatic}, {Automatic, 0}},
 FrontEndVersion->"12.0 for Mac OS X x86 (64-bit) (April 8, 2019)",
 StyleDefinitions->"Default.nb"
 ]
@@ -4782,23 +4599,18 @@ Cell[175813, 4158, 633, 14, 46, "Input",ExpressionUUID->"887a003c-9321-40cb-aa8b
  InitializationCell->True]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[176483, 4177, 224, 4, 37, "Subsubsection",ExpressionUUID->"9c7f131e-c689-4131-ad43-49fcd7da2862"],
-Cell[176710, 4183, 4957, 122, 345, "Input",ExpressionUUID->"c0c286a6-4f24-475f-b713-bbc59ae4b194"],
-Cell[181670, 4307, 1880, 48, 157, "Input",ExpressionUUID->"cba0e90b-c233-493e-b541-20a2e26a6119"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[183587, 4360, 172, 3, 45, "Subsubsection",ExpressionUUID->"b29fcca5-aa5f-4323-8c44-23977d017a71"],
-Cell[183762, 4365, 1963, 45, 215, "Input",ExpressionUUID->"bd9801bf-2808-45a1-a2ec-3c32b2f38df3",
+Cell[176483, 4177, 172, 3, 37, "Subsubsection",ExpressionUUID->"b29fcca5-aa5f-4323-8c44-23977d017a71"],
+Cell[176658, 4182, 1963, 45, 215, "Input",ExpressionUUID->"bd9801bf-2808-45a1-a2ec-3c32b2f38df3",
  InitializationCell->True],
-Cell[185728, 4412, 1971, 45, 215, "Input",ExpressionUUID->"4a6a672d-8911-43ee-8619-a810232322d8",
+Cell[178624, 4229, 1971, 45, 215, "Input",ExpressionUUID->"4a6a672d-8911-43ee-8619-a810232322d8",
  InitializationCell->True],
-Cell[187702, 4459, 1574, 39, 110, "Input",ExpressionUUID->"6748f971-35c3-4107-aaf2-a65179a7c4a0",
+Cell[180598, 4276, 1574, 39, 110, "Input",ExpressionUUID->"6748f971-35c3-4107-aaf2-a65179a7c4a0",
  InitializationCell->True],
-Cell[189279, 4500, 972, 25, 152, "Input",ExpressionUUID->"d24eaa4f-4004-49f9-a054-76db1003593e",
+Cell[182175, 4317, 972, 25, 152, "Input",ExpressionUUID->"d24eaa4f-4004-49f9-a054-76db1003593e",
  InitializationCell->True],
-Cell[190254, 4527, 922, 24, 152, "Input",ExpressionUUID->"77d4cbd5-7922-48ef-87a1-a7430437cdf1",
+Cell[183150, 4344, 922, 24, 152, "Input",ExpressionUUID->"77d4cbd5-7922-48ef-87a1-a7430437cdf1",
  InitializationCell->True]
-}, Open  ]]
+}, Closed]]
 }
 ]
 *)
