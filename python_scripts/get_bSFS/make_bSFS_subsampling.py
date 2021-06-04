@@ -134,11 +134,11 @@ def process_results(result_list, out_directory, name, num_blocks, num_lineages, 
 				print(f'{pos}, {mutype}, {empty_count}', file=file)
 		
 def main():
-	directory = '' #dir containing trees
-	out_directory = ''
+	directory = '/ceph/users/gbisshop/output/classic_sweeps/selection/selection_recap_long' #dir containing trees
+	out_directory = '/ceph/users/gbisshop/output/classic_sweeps/selection/selection_strong_single_replicates_0_Ne_long'
 	name = 'iton_subsampling'
 	blocksize = 100
-	time=30000
+	time=40000
 	cores = 60
 	num_lineages = 20
 	num_subsamples = 4
