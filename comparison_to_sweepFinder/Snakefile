@@ -1,0 +1,86 @@
+import tskit
+import numpy as np
+import os, glob, sys
+
+def read_ts_file(directory, file, num_lineages, times, Ne=10000):
+	ts = tskit.load(os.path.join(directory, file))
+	for time in times:
+		time = 2*2*Ne-2*Ne*float(time)
+		samples_time = [u for u in ts.samples() if ts.node(u).time == time]
+		subsamples = np.random.choice(samples_time, size=num_lineages, replace=False) 
+		ts_simple = ts.simplify(subsamples)
+		yield ts_simple
+
+def process_single_tree(num_lineages, times, input_directory, file_name, output_path, idx):
+	num_lineages = int(num_lineages)
+	single_tree_iterator = read_ts_file(input_directory, file_name, num_lineages, times)
+	for single_tree, time in zip(single_tree_iterator, times):
+		sequence_length=single_tree.sequence_length
+		positions_of_mutations = np.array([int(site.position) for site in single_tree.sites()])
+		positions_of_mutations = deal_with_finite_sites(positions_of_mutations)
+		allele_counts = np.sum(single_tree.genotype_matrix(), axis=1)
+		with open(output_path.format(num_lineages, time, idx), 'w') as outfile:
+			print('\t'.join(['position','x', 'n', 'folded']), file=outfile)
+			for position, variant in zip(positions_of_mutations, allele_counts):
+				if variant>0 and variant<num_lineages:
+					print('\t'.join([str(position), str(variant), str(num_lineages), '1']), file=outfile)
+
+def deal_with_finite_sites(pos_array):
+	idxs = np.insert((np.diff(pos_array)==0).astype(np.bool), 0, False)
+	if np.any(idxs): 
+		# if there are duplicates, get new values by incrementing by one
+		new_values = pos_array[idxs]+1
+		# get non-duplicate values
+		uniq_values = pos_array[~idxs]
+		# insert new_values in non-duplicated values (required sorted)
+		new_idxs = np.searchsorted(uniq_values, new_values)
+		# recursive call
+		return deal_with_finite_sites(np.sort(np.insert(uniq_values, new_idxs, new_values)))
+	# if there are no duplicated values
+	return pos_array
+
+
+tree_directory = ""
+trees_list = os.listdir(tree_directory)
+idxs = [int(tree.split('_')[-2]) for tree in trees_list]
+sample_sizes = [4, 12, 20]
+times_list = [0.1, 0.5, 1.0, 2.0]
+selection_modus = 'strong'
+freq_directory = f"selection_{selection_modus}_freqs"
+freq_result_python = freq_directory + "/" + "n{}_{}Ne/slim_{}_freq.tsv"
+out_directory = f"selection_{selection_modus}"
+input_directory =  ""
+
+all_results_pattern = out_directory + "/" + "n{num_lineages}_{time}Ne/slim_{idx}_sf2.tsv"
+all_results = expand(all_results_pattern,
+				num_lineages=sample_sizes,
+				time=times_list,
+				idx=idxs
+				)
+
+rule all:
+	input:
+		all_results
+
+rule process_tree:
+	output:
+		expand(freq_directory + "/" + "n{num_lineages}_{time}Ne/slim_{idx}_freq.tsv", 
+			num_lineages=sample_sizes,
+			time=times_list,
+			idx=idxs
+			)
+	run:
+		for t in trees_list:
+			idx = int(t.split('_')[-2])
+			for num_lineages in sample_sizes:
+				process_single_tree(num_lineages, times_list, tree_directory, t, freq_result_python, idx)
+
+rule sweepfinder:
+	input:
+		GridFile = input_directory + "/grid_file.tsv",
+		FreqFile = freq_directory + "/" + "n{num_lineages}_{time}Ne/slim_{idx}_freq.tsv",
+		SpectFile = input_directory + "/spect_file_n{num_lineages}.tsv"
+	output:
+		OutFile = out_directory + "/" + "n{num_lineages}_{time}Ne/slim_{idx}_sf2.tsv"
+	shell:
+		("/ceph/users/gbisshop/software/SF2/SweepFinder2 -lu {input.GridFile} {input.FreqFile} {input.SpectFile} {output.OutFile} || touch{output.OutFile}") 
