@@ -1,5 +1,5 @@
 # SweepsInTime
-Repository containing all notebooks and scripts for Bisschop et al. 2020. Sweeps In Time.
+Repository containing the supplementary figures as well as all notebooks and scripts for Bisschop et al. 2020. Sweeps In Time.
 
 # Abstract
 Current methods of identifying positively selected regions of the genome are limited by their underlying model in two key ways: the model cannot account for the timing of the adaptive event and the analytic predictions are limited to single nucleotide polymorphisms.  
